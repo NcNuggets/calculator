@@ -1,7 +1,5 @@
 //-----TO DO LIST-----//
 
-// need to remove duplicate operators with regex
-// need to add a backspace functionality (pops off the last input added to array)
 
 //-----INITIAL DECLARATIONS-----//
 let displayVal = 0;
@@ -13,7 +11,7 @@ function operate(array) {
   let outputArr = array;
   console.log('operatestart: ' + outputArr);
 
-  outputArr = calcPrepare(outputArr);
+  outputArr = prepare(outputArr);
   console.log('afterprep: ' + outputArr);
   outputArr = multiply(outputArr);
   console.log('aftermult: ' + outputArr);
@@ -23,76 +21,113 @@ function operate(array) {
   console.log('afteradd: ' + outputArr);
   outputArr = subtract(outputArr);
   console.log('aftersub: ' + outputArr);
-  outputArr = negatives(outputArr);
-  console.log('afternegs: ' + outputArr);
 
   input = outputArr;
   console.log('output is new input: ' + input);
 
-  displayVal = Math.round(Number(outputArr), -3);
-  displayAnswer(displayVal);
+  displayVal = preciseRound(Number(outputArr), 2);
+  display(displayVal);
 }
 
 //-----PREPARES INPUT STRING TO BE BROKEN INTO NUMBERS AND OPERATORS-----//
 
-function calcPrepare(array) {
+function prepare(array) {
   let prepared = Array.from(array);
   prepared = prepared.join('');
-  prepared = prepared.match(/(\-?[0-9.]+)|([\+\-\*\/])/g);
+  prepared = prepared.match(/([0-9.]+)|([\+\-\*\/])/g);
 
   return prepared;
 }
+
+//-----DISPLAYS THE ANSWER / CALCULATION-----//
+
+function display(result) {
+  let displayArea = document.querySelector('#display-text');
+  displayArea.textContent = result;
+}
+
+//-----BACKSPACE BUTTON-----//
+
+let backSpace = document.querySelector('.backspace');
+backSpace.addEventListener('click', (e) => {
+  input.pop();
+  display(input.join(' '));
+});
+
+//-----CLEAR BUTTON TO RESET CALCULATOR-----//
+function reset() {
+  displayVal = 0;
+  input = [];
+
+  return display(displayVal);
+}
+
+let clearBtn = document.querySelector('.clear');
+clearBtn.addEventListener('click', (e) => {
+  reset();
+});
 
 //-----OPERATIONS-----//
 
 function multiply(array) {
   let inputArr = Array.from(array);
   for (i = 0; i < inputArr.length; i++) {
-    if (inputArr[i] === '*') {
-      inputArr.splice(i - 1, 3, Number(inputArr[i-1]) * Number(inputArr[i+1]));
+    if (inputArr.includes('*')) {
+      if (inputArr[i] === '*') {
+        inputArr.splice(i - 1, 3, Number(inputArr[i-1]) * Number(inputArr[i+1]));
+        i--;
+      }
     }
   }
+
   return inputArr;
 }
 
 function divide(array) {
   let inputArr = Array.from(array);
   for (i = 0; i < inputArr.length; i++) {
-    if (inputArr[i] === '/') {
-      inputArr.splice(i - 1, 3, Number(inputArr[i-1]) / Number(inputArr[i+1]));
+    if (inputArr.includes('/')) {
+      if (inputArr[i] === '/') {
+        inputArr.splice(i - 1, 3, Number(inputArr[i-1]) / Number(inputArr[i+1]));
+        i--;
+      }
     }
   }
+
   return inputArr;
 }
 
 function add(array) {
   let inputArr = Array.from(array);
   for (i = 0; i < inputArr.length; i++) {
-    if (inputArr[i] === '+') {
-      inputArr.splice(i - 1, 3, Number(inputArr[i-1]) + Number(inputArr[i+1]));
+    if (inputArr.includes('+')) {
+      if (inputArr[i] === '+') {
+        inputArr.splice(i - 1, 3, Number(inputArr[i-1]) + Number(inputArr[i+1]));
+        i--;
+      }
     }
   }
+
   return inputArr;
 }
 
 function subtract(array) {
   let inputArr = Array.from(array);
   for (i = 0; i < inputArr.length; i++) {
-    if (inputArr[i] === '-') {
-      inputArr.splice(i - 1, 3, Number(inputArr[i-1]) - Number(inputArr[i+1]));
+    if (inputArr.includes('-')) {
+      if (inputArr[i] === '-') {
+        inputArr.splice(i - 1, 3, Number(inputArr[i-1]) - Number(inputArr[i+1]));
+        i--;
+      }
     }
   }
+
   return inputArr;
 }
 
-function negatives(array) {
-  let inputArr = Array.from(array);
-  for (i = 0; i < inputArr.length; i++) {
-    if (inputArr[i] < 0) {
-      inputArr.splice(i - 1, 2, Number(inputArr[i-1]) + Number(inputArr[i]));
-    }
-  }
-  return inputArr;
+function preciseRound(number, precision) {
+  let factor = Math.pow(10, precision);
+  return Math.round(number * factor) / factor;
 }
 
 //-----BUTTONS FOR CALCULATOR-----//
@@ -101,6 +136,7 @@ let numBtns = document.querySelectorAll('.number');
 numBtns.forEach((numBtn) => {
   numBtn.addEventListener('click', (e) => {
     input.push(numBtn.innerHTML);
+    display(input.join(' '));
   });
 });
 
@@ -108,6 +144,7 @@ let operatorBtns = document.querySelectorAll('.operator');
 operatorBtns.forEach((operatorBtn) => {
   operatorBtn.addEventListener('click', (e) => {
     input.push(operatorBtn.innerHTML);
+    display(input.join(' '));
   });
 });
 
@@ -119,23 +156,5 @@ equals.addEventListener('click', (e) => {
 let decimal = document.querySelector('.decimal');
 decimal.addEventListener('click', (e) => {
   input.push(decimal.innerHTML);
-});
-
-//-----DISPLAYS THE ANSWER / CALCULATION-----//
-
-function displayAnswer(result) {
-  const display = document.querySelector('#display-text');
-  display.textContent = result;
-}
-
-//-----CLEAR BUTTON TO RESET CALCULATOR-----//
-function reset() {
-  displayVal = 0;
-  input = [];
-  return displayAnswer(displayVal);
-}
-
-let clearBtn = document.querySelector('.clear');
-clearBtn.addEventListener('click', (e) => {
-  reset();
+  display(input.join(' '));
 });

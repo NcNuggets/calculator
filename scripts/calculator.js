@@ -9,21 +9,14 @@ let input = [];
 
 function operate(array) {
   let outputArr = array;
-  console.log('operatestart: ' + outputArr);
 
   outputArr = prepare(outputArr);
-  console.log('afterprep: ' + outputArr);
   outputArr = multiply(outputArr);
-  console.log('aftermult: ' + outputArr);
   outputArr = divide(outputArr);
-  console.log('afterdiv: ' + outputArr);
   outputArr = add(outputArr);
-  console.log('afteradd: ' + outputArr);
   outputArr = subtract(outputArr);
-  console.log('aftersub: ' + outputArr);
 
   input = outputArr;
-  console.log('output is new input: ' + input);
 
   displayVal = preciseRound(Number(outputArr), 2);
   display(displayVal);
@@ -51,6 +44,11 @@ function display(result) {
 let backSpace = document.querySelector('.backspace');
 backSpace.addEventListener('click', (e) => {
   input.pop();
+
+  if (input.length === 0) {
+    input.push(0);
+  }
+
   display(input.join(' '));
 });
 
@@ -132,29 +130,17 @@ function preciseRound(number, precision) {
 
 //-----BUTTONS FOR CALCULATOR-----//
 
-let numBtns = document.querySelectorAll('.number');
-numBtns.forEach((numBtn) => {
-  numBtn.addEventListener('click', (e) => {
-    input.push(numBtn.innerHTML);
+let buttons = document.querySelectorAll('.btn');
+buttons.forEach((button) => {
+  button.addEventListener('click', (e) => {
+    input.push(button.innerHTML);
     display(input.join(' '));
   });
 });
 
-let operatorBtns = document.querySelectorAll('.operator');
-operatorBtns.forEach((operatorBtn) => {
-  operatorBtn.addEventListener('click', (e) => {
-    input.push(operatorBtn.innerHTML);
-    display(input.join(' '));
-  });
-});
+//-----EQUALS BUTTON-----//
 
 let equals = document.querySelector('.equals');
 equals.addEventListener('click', (e) => {
   operate(input);
-});
-
-let decimal = document.querySelector('.decimal');
-decimal.addEventListener('click', (e) => {
-  input.push(decimal.innerHTML);
-  display(input.join(' '));
 });

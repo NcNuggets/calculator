@@ -1,1 +1,56 @@
+html {
+  height: 100%;
+  width: 100%;
+}
 
+body {
+
+}
+
+.calculator {
+  height: 400px;
+  width: 400px;
+  margin: auto;
+  padding-top: 25%
+}
+
+.display {
+  margin: auto;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 5px;
+  grid-auto-rows: minmax(25px, auto);
+  margin: auto;
+  text-align: center;
+}
+
+.grid-item {
+  height: 50px;
+  width: 50px;
+  margin: auto;
+  
+}
+
+#btn-0, #btn-1, #btn-2, #btn-3,
+#btn-4, #btn-5, #btn-6, #btn-7,
+#btn-8, #btn-9, #btn-decimal {
+
+}
+
+#btn-add, #btn-subtract,
+#btn-multiply, #btn-divide,
+#btn-backspace {
+
+}
+
+#btn-equals {
+
+}
+
+#btn-clear {
+
+}

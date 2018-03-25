@@ -1,9 +1,10 @@
 //-----TO DO LIST-----//
 
+// need to fix infinite loop if operator at the start of the STRING
+// if
 
 //-----INITIAL DECLARATIONS-----//
-let displayVal = 0;
-let input = [];
+let input = [0];
 
 //-----RUNS ACCORDING TO PEMDAS (I HOPE)-----//
 
@@ -18,16 +19,33 @@ function operate(array) {
 
   input = outputArr;
 
-  displayVal = preciseRound(Number(outputArr), 2);
-  display(displayVal);
+  if (isNaN(preciseRound(outputArr, 3))) {
+    reset();
+  } else {
+    display(preciseRound(outputArr, 3));
+  }
 }
 
 //-----PREPARES INPUT STRING TO BE BROKEN INTO NUMBERS AND OPERATORS-----//
 
 function prepare(array) {
   let prepared = Array.from(array);
+
   prepared = prepared.join('');
+  console.log(prepared);
   prepared = prepared.match(/([0-9.]+)|([\+\-\*\/])/g);
+  console.log(prepared);
+
+  if (RegExp(/([\+\-\*\/])/g).test(prepared[prepared.length - 1])) {
+    prepared.pop();
+    console.log(prepared);
+  } else if (RegExp(/(^[\-])/g).test(prepared[0])) {
+    prepared.splice(0, 2, prepared[0] + prepared[1]);
+    console.log(prepared);
+  } else if (RegExp(/(^[\+\*\/])/g).test(prepared[0])) {
+    prepared.shift();
+    console.log(prepared);
+  }
 
   return prepared;
 }
@@ -49,15 +67,13 @@ backSpace.addEventListener('click', (e) => {
     input.push(0);
   }
 
-  display(input.join(' '));
+  display(input.join(''));
 });
 
 //-----CLEAR BUTTON TO RESET CALCULATOR-----//
 function reset() {
-  displayVal = 0;
-  input = [];
-
-  return display(displayVal);
+  input = [0];
+  return display(0);
 }
 
 let clearBtn = document.querySelector('.clear');
@@ -72,8 +88,9 @@ function multiply(array) {
   for (i = 0; i < inputArr.length; i++) {
     if (inputArr.includes('*')) {
       if (inputArr[i] === '*') {
-        inputArr.splice(i - 1, 3, Number(inputArr[i-1]) * Number(inputArr[i+1]));
-        i--;
+        inputArr.splice(i - 1, 3, preciseRound(Number(inputArr[i - 1]) *
+        Number(inputArr[i + 1]), 3));
+        i--; // move back 1 after running because it was skipping instances
       }
     }
   }
@@ -86,7 +103,8 @@ function divide(array) {
   for (i = 0; i < inputArr.length; i++) {
     if (inputArr.includes('/')) {
       if (inputArr[i] === '/') {
-        inputArr.splice(i - 1, 3, Number(inputArr[i-1]) / Number(inputArr[i+1]));
+        inputArr.splice(i - 1, 3, preciseRound(Number(inputArr[i - 1]) /
+        Number(inputArr[i + 1]), 3));
         i--;
       }
     }
@@ -100,7 +118,8 @@ function add(array) {
   for (i = 0; i < inputArr.length; i++) {
     if (inputArr.includes('+')) {
       if (inputArr[i] === '+') {
-        inputArr.splice(i - 1, 3, Number(inputArr[i-1]) + Number(inputArr[i+1]));
+        inputArr.splice(i - 1, 3, preciseRound(Number(inputArr[i - 1]) +
+        Number(inputArr[i + 1]), 3));
         i--;
       }
     }
@@ -114,7 +133,8 @@ function subtract(array) {
   for (i = 0; i < inputArr.length; i++) {
     if (inputArr.includes('-')) {
       if (inputArr[i] === '-') {
-        inputArr.splice(i - 1, 3, Number(inputArr[i-1]) - Number(inputArr[i+1]));
+        inputArr.splice(i - 1, 3, preciseRound(Number(inputArr[i - 1]) -
+        Number(inputArr[i + 1]), 3));
         i--;
       }
     }
@@ -123,6 +143,7 @@ function subtract(array) {
   return inputArr;
 }
 
+// needed to create a rounder so the number lengths didn't get out of control
 function preciseRound(number, precision) {
   let factor = Math.pow(10, precision);
   return Math.round(number * factor) / factor;
@@ -133,8 +154,21 @@ function preciseRound(number, precision) {
 let buttons = document.querySelectorAll('.btn');
 buttons.forEach((button) => {
   button.addEventListener('click', (e) => {
-    input.push(button.innerHTML);
-    display(input.join(' '));
+    let latestInput = (input.length > 0) ? input[input.length - 1] : input[0];
+
+    // needed to replace the first digit of 0 so there isn't a string of 0's
+    // at the start of the input
+    if (input[0] == 0 && input.length <= 1) {
+      input.pop();
+    }
+
+    // needed to replace the last input if the input array became too long for
+    // the display
+    if (input.length < 15) {
+      input.push(button.innerHTML);
+      display(input.join(''));
+    }
+
   });
 });
 
@@ -142,5 +176,6 @@ buttons.forEach((button) => {
 
 let equals = document.querySelector('.equals');
 equals.addEventListener('click', (e) => {
-  operate(input);
+  prepare(input);
+  //operate(input);
 });
